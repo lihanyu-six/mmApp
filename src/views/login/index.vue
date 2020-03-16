@@ -10,22 +10,107 @@
         <span class="three">用户登录</span>
       </div>
       <!-- 饿了么UI 写的ipt框-->
-      <div>
-        <el-input placeholder="请输入手机号" prefix-icon="el-icon-search" v-model="input1"></el-input>
+      <div class="formIpt">
+        <!-- form表单 -->
+        <el-form ref="form" :model="form" label-width="0px" :rules="rules">
+          <!-- input表单域 -->
+          <el-form-item>
+            <el-input prefix-icon="el-icon-user" placeholder="请输入手机号" v-model="form.phone"></el-input>
+          </el-form-item>
+          <el-form-item prop="password">
+            <el-input prefix-icon="el-icon-lock" placeholder="请输入密码" v-model="form.password"></el-input>
+          </el-form-item>
+          <el-row class="yanzhenIpt">
+            <el-col :span="16">
+              <el-form-item prop="yanzhen">
+                <el-input prefix-icon="el-icon-key" placeholder="请输入验证码" v-model="form.yanzhen"></el-input>
+              </el-form-item>
+            </el-col>
+            <el-col :span="8">
+              <img src="../../assets/images/login_captcha.png" alt class="yzimg" />
+            </el-col>
+          </el-row>
+
+          <!-- 多选框表单域 -->
+          <el-form-item prop="type">
+            <div class="el-form-item__content checkBox">
+              <el-checkbox v-model="form.type">
+                我已阅读并同意
+                <el-link type="primary">用户协议</el-link>和
+                <el-link type="primary">隐私条款</el-link>
+              </el-checkbox>
+            </div>
+          </el-form-item>
+
+          <!-- 下面得登录以及注册按钮 -->
+          <el-form-item>
+            <el-button type="primary" class="loginBtn" @click="onSubmit">登录</el-button>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" class="loginBtn" @click="openRg">注册</el-button>
+          </el-form-item>
+        </el-form>
       </div>
     </div>
     <!-- 右边的照片 -->
     <img class="right_box" src="../../assets/images/login_banner_ele.png" alt />
+    <register ref="register"></register>
   </div>
 </template>
 
 <script>
+import register from "./components/register";
 export default {
-    data() {
-        return {
-            input1:''
+  components: {
+    register
+  },
+  data() {
+    return {
+      form: {
+        phone: "",
+        password: "",
+        yanzhen: "",
+        type: []
+      },
+      rules: {
+        password: [
+          { required: true, message: "请输入密码", trigger: "blur" },
+          { min: 5, max: 10, message: "长度在 5 到 10 个字符", trigger: "blur" }
+        ],
+        yanzhen: [
+          { required: true, message: "请输入验证码", trigger: "blur" },
+          { min: 4, max: 4, message: "长度必须为 4 个字符", trigger: "blur" }
+        ],
+        type: [
+          {
+            type: "array",
+            required: true,
+            message: "请您确定您已阅读并同意协议条款",
+            trigger: "change"
+          }
+        ]
+      }
+    };
+  },
+  methods: {
+    onSubmit() {
+      this.$refs.form.validate(valid => {
+        if (valid) {
+          this.$message({
+            message: "恭喜你，验证成功",
+            type: "success"
+          });
+        } else {
+          this.$message.error("验证失败！");
+          return false;
         }
+      });
     },
+
+    openRg() {
+      this.$refs.register.dialogFormVisible = true;
+    }
+  }
 };
 </script>
 
@@ -69,6 +154,19 @@ export default {
         font-weight: 400;
         color: rgba(12, 12, 12, 1);
         margin-left: 14px;
+      }
+    }
+    .formIpt {
+      margin-top: 29px;
+      .yzimg {
+        height: 40px;
+        width: 100%;
+      }
+      .el-form-item__content.checkBox {
+        line-height: 20px;
+      }
+      .loginBtn {
+        width: 100%;
       }
     }
   }
