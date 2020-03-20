@@ -14,7 +14,7 @@
         <!-- form表单 -->
         <el-form ref="form" :model="form" label-width="0px" :rules="rules">
           <!-- input表单域 -->
-          <el-form-item>
+          <el-form-item prop="phone">
             <el-input prefix-icon="el-icon-user" placeholder="请输入手机号" v-model="form.phone"></el-input>
           </el-form-item>
           <el-form-item prop="password">
@@ -27,7 +27,7 @@
               </el-form-item>
             </el-col>
             <el-col :span="8">
-              <img src="../../assets/images/login_captcha.png" alt class="yzimg" />
+              <img :src="imgUrl" @click="getImg" alt class="yzimg" />
             </el-col>
           </el-row>
 
@@ -60,6 +60,9 @@
 
 <script>
 import register from "./components/register";
+import myCheck from "@/utils/mycheck.js";
+import { getlogin } from '@/api/login.js';  
+import { setToken } from '@/utils/myToken.js'
 export default {
   components: {
     register
@@ -73,6 +76,10 @@ export default {
         type: []
       },
       rules: {
+        phone: [
+          { validator: myCheck.checkPhone, trigger: "blur" },
+          { required: true, message: "手机号不能为空", trigger: "blur" }
+        ],
         password: [
           { required: true, message: "请输入密码", trigger: "blur" },
           { min: 5, max: 10, message: "长度在 5 到 10 个字符", trigger: "blur" }
@@ -89,17 +96,28 @@ export default {
             trigger: "change"
           }
         ]
-      }
+      },
+      imgUrl: process.env.VUE_APP_URL + "/captcha?type=login&t=" + Date.now()
     };
   },
   methods: {
     onSubmit() {
       this.$refs.form.validate(valid => {
         if (valid) {
-          this.$message({
-            message: "恭喜你，验证成功",
-            type: "success"
-          });
+          getlogin({
+            phone : this.form.phone,
+            password : this.form.password,
+            code : this.form.yanzhen
+          }).then(res=>{
+            // window.console.log(res)
+            if(res.data.code == 200){
+              this.$message.success('登录成功!')
+              setToken(res.data.data.token);
+              this.$router.push('/index')
+            }else{
+              this.$message.error('登录失败!')
+            }
+          })
         } else {
           this.$message.error("验证失败！");
           return false;
@@ -109,6 +127,10 @@ export default {
 
     openRg() {
       this.$refs.register.dialogFormVisible = true;
+    },
+    getImg() {
+      this.imgUrl =
+        process.env.VUE_APP_URL + "/captcha?type=login&t=" + Date.now();
     }
   }
 };
@@ -120,6 +142,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: space-around;
+  background:linear-gradient(225deg,rgba(20,147,250,1),rgba(1,198,250,1));
   /* 左边的盒子 */
   .left_box {
     box-sizing: border-box;
