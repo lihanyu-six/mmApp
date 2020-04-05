@@ -18,12 +18,12 @@
             <el-input prefix-icon="el-icon-user" placeholder="请输入手机号" v-model="form.phone"></el-input>
           </el-form-item>
           <el-form-item prop="password">
-            <el-input prefix-icon="el-icon-lock" placeholder="请输入密码" v-model="form.password"></el-input>
+            <el-input prefix-icon="el-icon-lock" placeholder="请输入密码" type="password" v-model="form.password"></el-input>
           </el-form-item>
           <el-row class="yanzhenIpt">
             <el-col :span="16">
               <el-form-item prop="yanzhen">
-                <el-input prefix-icon="el-icon-key" placeholder="请输入验证码" v-model="form.yanzhen"></el-input>
+                <el-input prefix-icon="el-icon-key" placeholder="请输入验证码" v-model="form.yanzhen" @keyup.enter.native="onSubmit"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="8">
@@ -34,7 +34,7 @@
           <!-- 多选框表单域 -->
           <el-form-item prop="type">
             <div class="el-form-item__content checkBox">
-              <el-checkbox v-model="form.type">
+              <el-checkbox v-model="form.type" :checked="true">
                 我已阅读并同意
                 <el-link type="primary">用户协议</el-link>和
                 <el-link type="primary">隐私条款</el-link>
@@ -70,8 +70,8 @@ export default {
   data() {
     return {
       form: {
-        phone: "",
-        password: "",
+        phone: "18229289009",
+        password: "123456",
         yanzhen: "",
         type: []
       },
@@ -119,7 +119,7 @@ export default {
             }
           })
         } else {
-          this.$message.error("验证失败！");
+          this.$message.error("账号或密码错误！");
           return false;
         }
       });
